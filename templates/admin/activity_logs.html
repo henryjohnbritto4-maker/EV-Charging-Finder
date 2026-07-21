@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Audit Logs - EV Charging Finder</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+
+<style>
+
+body{
+    background:#f5f6fa;
+}
+
+
+.sidebar{
+
+    min-height:100vh;
+    background:#212529;
+
+}
+
+
+.sidebar a{
+
+    color:white;
+    text-decoration:none;
+    display:block;
+    padding:12px;
+
+}
+
+
+.sidebar a:hover{
+
+    background:#343a40;
+
+}
+
+
+.card{
+
+    border-radius:15px;
+
+}
+
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+<div class="container-fluid">
+
+
+<div class="row">
+
+
+
+<!-- Sidebar -->
+
+
+<div class="col-md-3 col-lg-2 sidebar">
+
+
+<h4 class="text-white text-center mt-3">
+
+⚡ EV Finder
+
+</h4>
+
+
+<hr class="text-white">
+
+
+
+<a href="{{ url_for('admin.dashboard') }}">
+
+<i class="fa fa-dashboard"></i>
+
+Dashboard
+
+</a>
+
+
+
+<a href="{{ url_for('admin.users') }}">
+
+<i class="fa fa-users"></i>
+
+Users
+
+</a>
+
+
+
+<a href="{{ url_for('admin.stations') }}">
+
+<i class="fa fa-charging-station"></i>
+
+Stations
+
+</a>
+
+
+
+<a href="{{ url_for('admin.bookings') }}">
+
+<i class="fa fa-calendar"></i>
+
+Bookings
+
+</a>
+
+
+
+<a href="{{ url_for('admin.audit_logs') }}">
+
+<i class="fa fa-file-lines"></i>
+
+Audit Logs
+
+</a>
+
+
+
+<a href="{{ url_for('main.logout') }}">
+
+<i class="fa fa-sign-out"></i>
+
+Logout
+
+</a>
+
+
+</div>
+
+
+
+
+
+<!-- Content -->
+
+
+<div class="col-md-9 col-lg-10 p-4">
+
+
+<h2>
+
+<i class="fa fa-file-lines"></i>
+
+Audit Logs
+
+</h2>
+
+
+<hr>
+
+
+
+
+
+<div class="card shadow">
+
+
+<div class="card-header bg-dark text-white">
+
+
+System Activity Logs
+
+
+</div>
+
+
+
+<div class="card-body table-responsive">
+
+
+
+<table class="table table-bordered table-hover">
+
+
+<thead class="table-light">
+
+
+<tr>
+
+<th>ID</th>
+
+<th>User</th>
+
+<th>Action</th>
+
+<th>IP Address</th>
+
+<th>Date</th>
+
+<th>Status</th>
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody>
+
+
+
+{% for log in audit_logs %}
+
+
+<tr>
+
+
+<td>
+
+{{ log.id }}
+
+</td>
+
+
+
+<td>
+
+{{ log.user }}
+
+</td>
+
+
+
+<td>
+
+{{ log.action }}
+
+</td>
+
+
+
+<td>
+
+{{ log.ip_address }}
+
+</td>
+
+
+
+<td>
+
+{{ log.created_at }}
+
+</td>
+
+
+
+<td>
+
+
+<span class="badge bg-success">
+
+{{ log.status }}
+
+</span>
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% else %}
+
+
+
+<tr>
+
+
+<td colspan="6"
+class="text-center">
+
+
+No audit logs available
+
+
+</td>
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<br>
+
+
+
+<div class="card shadow p-4">
+
+
+<h5>
+
+Log Summary
+
+</h5>
+
+
+<div class="row">
+
+
+<div class="col-md-4">
+
+
+<h6>Total Logs</h6>
+
+<h3>
+
+{{ total_logs }}
+
+</h3>
+
+
+</div>
+
+
+
+<div class="col-md-4">
+
+
+<h6>Successful Actions</h6>
+
+<h3>
+
+{{ total_logs }}
+
+</h3>
+
+
+</div>
+
+
+
+<div class="col-md-4">
+
+
+<h6>Failed Actions</h6>
+
+<h3>
+
+0
+
+</h3>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+
+
+</html>

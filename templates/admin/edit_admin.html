@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+
+<title>Edit Admin | EV Charging Finder</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body class="bg-light">
+
+
+{% include 'admin/_sidebar.html' %}
+
+
+
+
+
+<div class="container-fluid"
+style="margin-left:260px;padding:30px;">
+
+
+
+
+
+
+<!-- Header -->
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+
+<div>
+
+
+<h2 class="fw-bold">
+
+
+<i class="fa-solid fa-user-pen text-success"></i>
+
+
+Edit Administrator
+
+
+</h2>
+
+
+<p class="text-muted">
+
+Update admin details and permissions
+
+</p>
+
+
+</div>
+
+
+
+
+<a href="{{ url_for('admin.manage_admins') }}"
+class="btn btn-outline-success">
+
+
+<i class="fa-solid fa-arrow-left"></i>
+
+
+Back
+
+
+</a>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="row justify-content-center">
+
+
+<div class="col-lg-8">
+
+
+
+<div class="card shadow-lg border-0">
+
+
+
+<div class="card-header bg-success text-white">
+
+
+<h4 class="mb-0">
+
+
+<i class="fa-solid fa-user-shield"></i>
+
+
+Administrator Profile
+
+
+</h4>
+
+
+</div>
+
+
+
+
+
+
+<div class="card-body p-4">
+
+
+
+
+
+
+{% with messages=get_flashed_messages(with_categories=true) %}
+
+
+{% if messages %}
+
+
+
+{% for category,message in messages %}
+
+
+<div class="alert alert-{{category}} alert-dismissible fade show">
+
+
+{{ message }}
+
+
+<button type="button"
+class="btn-close"
+data-bs-dismiss="alert">
+
+</button>
+
+
+</div>
+
+
+{% endfor %}
+
+
+
+{% endif %}
+
+
+{% endwith %}
+
+
+
+
+
+
+
+
+<form method="POST"
+action="{{ url_for('admin.edit_admin', id=admin.id) }}"
+enctype="multipart/form-data"
+id="editAdminForm">
+
+
+
+
+
+
+
+
+<!-- Profile Image -->
+
+
+<div class="text-center mb-4">
+
+
+<img src="{{ url_for('static', filename='uploads/' + admin.profile_image) if admin.profile_image else url_for('static', filename='images/admin-avatar.png') }}"
+class="rounded-circle shadow"
+width="130"
+height="130">
+
+
+
+
+
+<div class="mt-3">
+
+
+<input type="file"
+name="profile_image"
+class="form-control">
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="row">
+
+
+<div class="col-md-6 mb-3">
+
+
+<label class="form-label">
+
+Full Name
+
+</label>
+
+
+
+<input type="text"
+class="form-control"
+name="name"
+value="{{ admin.name }}"
+required>
+
+
+</div>
+
+
+
+
+
+
+<div class="col-md-6 mb-3">
+
+
+<label class="form-label">
+
+Email Address
+
+</label>
+
+
+
+<input type="email"
+class="form-control"
+name="email"
+value="{{ admin.email }}"
+required>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="mb-3">
+
+
+<label class="form-label">
+
+Admin Role
+
+</label>
+
+
+
+<select class="form-select"
+name="role">
+
+
+
+<option value="Super Admin"
+{% if admin.role=="Super Admin" %}selected{% endif %}>
+
+Super Admin
+
+</option>
+
+
+
+<option value="Station Manager"
+{% if admin.role=="Station Manager" %}selected{% endif %}>
+
+Station Manager
+
+</option>
+
+
+
+<option value="Support Admin"
+{% if admin.role=="Support Admin" %}selected{% endif %}>
+
+Support Admin
+
+</option>
+
+
+
+</select>
+
+
+</div>
+<!-- Permissions -->
+
+
+<div class="mb-4">
+
+
+<label class="form-label">
+
+
+Permissions
+
+
+</label>
+
+
+
+<div class="row">
+
+
+
+<div class="col-md-6">
+
+
+
+<div class="form-check mb-2">
+
+
+<input class="form-check-input"
+type="checkbox"
+name="permissions"
+value="users"
+id="users"
+{% if admin.permissions and 'users' in admin.permissions %}checked{% endif %}>
+
+
+<label class="form-check-label"
+for="users">
+
+
+Manage Users
+
+
+</label>
+
+
+</div>
+
+
+
+
+
+
+<div class="form-check mb-2">
+
+
+<input class="form-check-input"
+type="checkbox"
+name="permissions"
+value="stations"
+id="stations"
+{% if admin.permissions and 'stations' in admin.permissions %}checked{% endif %}>
+
+
+<label class="form-check-label"
+for="stations">
+
+
+Manage Stations
+
+
+</label>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="col-md-6">
+
+
+
+<div class="form-check mb-2">
+
+
+<input class="form-check-input"
+type="checkbox"
+name="permissions"
+value="bookings"
+id="bookings"
+{% if admin.permissions and 'bookings' in admin.permissions %}checked{% endif %}>
+
+
+<label class="form-check-label"
+for="bookings">
+
+
+Manage Bookings
+
+
+</label>
+
+
+</div>
+
+
+
+
+
+
+<div class="form-check mb-2">
+
+
+<input class="form-check-input"
+type="checkbox"
+name="permissions"
+value="reports"
+id="reports"
+{% if admin.permissions and 'reports' in admin.permissions %}checked{% endif %}>
+
+
+<label class="form-check-label"
+for="reports">
+
+
+View Reports
+
+
+</label>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Change Password -->
+
+
+<div class="card bg-light border-0 mb-4">
+
+
+<div class="card-body">
+
+
+<h5>
+
+
+<i class="fa-solid fa-key text-warning"></i>
+
+
+Change Password
+
+
+</h5>
+
+
+
+<p class="text-muted">
+
+Leave blank to keep current password
+
+</p>
+
+
+
+
+
+<div class="row">
+
+
+
+<div class="col-md-6">
+
+
+<input type="password"
+class="form-control"
+name="password"
+id="password"
+placeholder="New Password">
+
+
+</div>
+
+
+
+
+
+<div class="col-md-6">
+
+
+<input type="password"
+class="form-control"
+name="confirm_password"
+id="confirm_password"
+placeholder="Confirm Password">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Account Status -->
+
+
+<div class="mb-4">
+
+
+<label class="form-label">
+
+
+Account Status
+
+
+</label>
+
+
+
+<select class="form-select"
+name="status">
+
+
+
+<option value="Active"
+{% if admin.status=="Active" %}selected{% endif %}>
+
+
+Active
+
+
+</option>
+
+
+
+<option value="Disabled"
+{% if admin.status=="Disabled" %}selected{% endif %}>
+
+
+Disabled
+
+
+</option>
+
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Buttons -->
+
+
+<div class="d-grid gap-2">
+
+
+<button type="submit"
+class="btn btn-success btn-lg">
+
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+
+Save Changes
+
+
+</button>
+
+
+
+
+
+<a href="{{ url_for('admin.manage_admins') }}"
+class="btn btn-outline-secondary">
+
+
+<i class="fa-solid fa-xmark"></i>
+
+
+Cancel
+
+
+</a>
+
+
+</div>
+
+
+
+
+
+</form>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Footer -->
+
+
+<footer class="bg-dark text-white text-center py-4 mt-5">
+
+
+<div class="container">
+
+
+<h5>
+
+⚡ EV Charging Finder Admin Panel
+
+</h5>
+
+
+<p class="mb-0">
+
+BCA Final Year Project © 2026
+
+</p>
+
+
+</div>
+
+
+</footer>
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+
+<script>
+
+
+document.getElementById("editAdminForm")
+.addEventListener("submit",function(e){
+
+
+
+let password=document.getElementById("password").value;
+
+
+let confirmPassword=document.getElementById("confirm_password").value;
+
+
+
+
+
+if(password!=="" && password.length < 6){
+
+
+alert("Password must contain minimum 6 characters.");
+
+
+e.preventDefault();
+
+
+return;
+
+
+}
+
+
+
+
+
+if(password!==confirmPassword){
+
+
+alert("Password confirmation does not match.");
+
+
+e.preventDefault();
+
+
+return;
+
+
+}
+
+
+
+});
+
+
+
+
+
+
+
+setTimeout(function(){
+
+
+let alerts=document.querySelectorAll(".alert");
+
+
+alerts.forEach(function(alert){
+
+
+alert.remove();
+
+
+});
+
+
+},4000);
+
+
+
+</script>
+
+
+
+
+
+
+
+</div>
+
+
+</body>
+
+
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>System Monitor | EV Charging Finder Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+<body class="bg-light">
+
+{% include 'admin/_sidebar.html' %}
+
+<div class="container-fluid"
+style="margin-left:260px;padding:30px;">
+
+<!-- Header -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<div>
+
+<h2 class="fw-bold">
+
+<i class="fa-solid fa-server text-success"></i>
+
+System Monitor
+
+</h2>
+
+<p class="text-muted">
+
+Monitor server health and application performance
+
+</p>
+
+</div>
+
+<div>
+
+<button class="btn btn-success"
+onclick="location.reload()">
+
+<i class="fa-solid fa-rotate"></i>
+
+Refresh
+
+</button>
+
+</div>
+
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+
+<div class="alert alert-{{ category }} alert-dismissible fade show">
+
+{{ message }}
+
+<button type="button"
+class="btn-close"
+data-bs-dismiss="alert"></button>
+
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- Status Cards -->
+
+<div class="row">
+
+<div class="col-md-3 mb-4">
+
+<div class="card border-primary shadow-sm">
+
+<div class="card-body text-center">
+
+<i class="fa-solid fa-microchip fa-2x text-primary mb-3"></i>
+
+<h5>CPU Usage</h5>
+
+<h3>{{ cpu_usage if cpu_usage is defined else "0%" }}</h3>
+
+<div class="progress mt-3">
+
+<div class="progress-bar bg-primary"
+role="progressbar"
+style="width: {{ cpu_usage if cpu_usage is defined else '0%' }}">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3 mb-4">
+
+<div class="card border-success shadow-sm">
+
+<div class="card-body text-center">
+
+<i class="fa-solid fa-memory fa-2x text-success mb-3"></i>
+
+<h5>RAM Usage</h5>
+
+<h3>{{ ram_usage if ram_usage is defined else "0%" }}</h3>
+
+<div class="progress mt-3">
+
+<div class="progress-bar bg-success"
+role="progressbar"
+style="width: {{ ram_usage if ram_usage is defined else '0%' }}">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3 mb-4">
+
+<div class="card border-warning shadow-sm">
+
+<div class="card-body text-center">
+
+<i class="fa-solid fa-hard-drive fa-2x text-warning mb-3"></i>
+
+<h5>Disk Usage</h5>
+
+<h3>{{ disk_usage if disk_usage is defined else "0%" }}</h3>
+
+<div class="progress mt-3">
+
+<div class="progress-bar bg-warning"
+role="progressbar"
+style="width: {{ disk_usage if disk_usage is defined else '0%' }}">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3 mb-4">
+
+<div class="card border-danger shadow-sm">
+
+<div class="card-body text-center">
+
+<i class="fa-solid fa-database fa-2x text-danger mb-3"></i>
+
+<h5>Database</h5>
+
+<h3>
+
+{% if database_status is defined %}
+
+{{ database_status }}
+
+{% else %}
+
+Online
+
+{% endif %}
+
+</h3>
+
+<span class="badge bg-success">
+
+Connected
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Live Statistics -->
+
+<div class="row">
+
+<div class="col-lg-6">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-header bg-dark text-white">
+
+<h5 class="mb-0">
+
+<i class="fa-solid fa-chart-line"></i>
+
+Live Statistics
+
+</h5>
+
+</div>
+
+<div class="card-body">
+    <div class="row g-3">
+
+    <div class="col-6">
+
+        <div class="border rounded p-3 text-center">
+
+            <i class="fa-solid fa-users text-primary fa-2x mb-2"></i>
+
+            <h4>{{ active_users if active_users is defined else 0 }}</h4>
+
+            <small class="text-muted">Active Users</small>
+
+        </div>
+
+    </div>
+
+    <div class="col-6">
+
+        <div class="border rounded p-3 text-center">
+
+            <i class="fa-solid fa-calendar-check text-success fa-2x mb-2"></i>
+
+            <h4>{{ today_bookings if today_bookings is defined else 0 }}</h4>
+
+            <small class="text-muted">Today's Bookings</small>
+
+        </div>
+
+    </div>
+
+    <div class="col-6">
+
+        <div class="border rounded p-3 text-center">
+
+            <i class="fa-solid fa-charging-station text-warning fa-2x mb-2"></i>
+
+            <h4>{{ online_stations if online_stations is defined else 0 }}</h4>
+
+            <small class="text-muted">Online Stations</small>
+
+        </div>
+
+    </div>
+
+    <div class="col-6">
+
+        <div class="border rounded p-3 text-center">
+
+            <i class="fa-solid fa-bolt text-danger fa-2x mb-2"></i>
+
+            <h4>{{ charging_sessions if charging_sessions is defined else 0 }}</h4>
+
+            <small class="text-muted">Charging Sessions</small>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-6">
+
+<div class="card shadow-sm border-0">
+
+<div class="card-header bg-success text-white">
+
+<h5 class="mb-0">
+
+<i class="fa-solid fa-server"></i>
+
+System Services
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<table class="table align-middle">
+
+<thead>
+
+<tr>
+
+<th>Service</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>Web Server</td>
+
+<td><span class="badge bg-success">Running</span></td>
+
+</tr>
+
+<tr>
+
+<td>Database</td>
+
+<td><span class="badge bg-success">Connected</span></td>
+
+</tr>
+
+<tr>
+
+<td>Email Service</td>
+
+<td><span class="badge bg-success">Online</span></td>
+
+</tr>
+
+<tr>
+
+<td>Maps API</td>
+
+<td><span class="badge bg-success">Available</span></td>
+
+</tr>
+
+<tr>
+
+<td>Background Jobs</td>
+
+<td><span class="badge bg-success">Running</span></td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card shadow-sm border-0 mt-4">
+
+<div class="card-header bg-primary text-white">
+
+<h5 class="mb-0">
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+Recent System Events
+
+</h5>
+
+</div>
+
+<div class="card-body">
+
+<ul class="list-group list-group-flush">
+
+{% for event in recent_events %}
+
+<li class="list-group-item d-flex justify-content-between">
+
+<div>
+
+<i class="fa-solid fa-circle-info text-primary me-2"></i>
+
+{{ event.message }}
+
+</div>
+
+<small class="text-muted">
+
+{{ event.time }}
+
+</small>
+
+</li>
+
+{% else %}
+
+<li class="list-group-item text-center text-muted">
+
+No recent system events.
+
+</li>
+
+{% endfor %}
+
+</ul>
+
+</div>
+
+</div>
+
+<footer class="bg-dark text-white text-center py-4 mt-5">
+
+<div class="container">
+
+<h5>
+
+⚡ EV Charging Finder Admin Panel
+
+</h5>
+
+<p class="mb-0">
+
+BCA Final Year Project © 2026
+
+</p>
+
+</div>
+
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+setInterval(function(){
+
+    location.reload();
+
+},60000);
+
+setTimeout(function(){
+
+    document.querySelectorAll(".alert").forEach(function(alert){
+
+        alert.remove();
+
+    });
+
+},4000);
+
+</script>
+
+</div>
+
+</body>
+
+</html>

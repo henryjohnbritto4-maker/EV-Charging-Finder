@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Audit Logs | EV Charging Finder Admin</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body class="bg-light">
+
+
+{% include 'admin/_sidebar.html' %}
+
+
+
+<div class="container-fluid"
+style="margin-left:260px;padding:30px;">
+
+
+
+<!-- Header -->
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+
+<div>
+
+
+<h2 class="fw-bold">
+
+<i class="fa-solid fa-shield-halved text-success"></i>
+
+Audit Logs
+
+</h2>
+
+
+<p class="text-muted">
+
+Track administrator and user system activities
+
+</p>
+
+
+</div>
+
+
+
+<div>
+
+
+<a href="{{ url_for('admin.dashboard') }}"
+class="btn btn-outline-success">
+
+
+<i class="fa-solid fa-house"></i>
+
+Dashboard
+
+
+</a>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+{% with messages=get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+{% for category,message in messages %}
+
+
+<div class="alert alert-{{category}} alert-dismissible fade show">
+
+
+{{message}}
+
+
+<button type="button"
+class="btn-close"
+data-bs-dismiss="alert">
+
+</button>
+
+
+</div>
+
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+
+
+
+
+<!-- Audit Summary -->
+
+
+<div class="row mb-4">
+
+
+<div class="col-md-3">
+
+
+<div class="card border-primary shadow-sm text-center">
+
+
+<div class="card-body">
+
+
+<i class="fa-solid fa-list fa-2x text-primary mb-2"></i>
+
+
+<h3>
+
+{{ total_logs if total_logs is defined else 0 }}
+
+</h3>
+
+
+<p class="mb-0">
+
+Total Logs
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="col-md-3">
+
+
+<div class="card border-success shadow-sm text-center">
+
+
+<div class="card-body">
+
+
+<i class="fa-solid fa-user-shield fa-2x text-success mb-2"></i>
+
+
+<h3>
+
+{{ admin_actions if admin_actions is defined else 0 }}
+
+</h3>
+
+
+<p class="mb-0">
+
+Admin Actions
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="col-md-3">
+
+
+<div class="card border-warning shadow-sm text-center">
+
+
+<div class="card-body">
+
+
+<i class="fa-solid fa-right-to-bracket fa-2x text-warning mb-2"></i>
+
+
+<h3>
+
+{{ login_attempts if login_attempts is defined else 0 }}
+
+</h3>
+
+
+<p class="mb-0">
+
+Login Attempts
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="col-md-3">
+
+
+<div class="card border-danger shadow-sm text-center">
+
+
+<div class="card-body">
+
+
+<i class="fa-solid fa-triangle-exclamation fa-2x text-danger mb-2"></i>
+
+
+<h3>
+
+{{ security_events if security_events is defined else 0 }}
+
+</h3>
+
+
+<p class="mb-0">
+
+Security Events
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<!-- Filter -->
+
+
+<div class="card shadow-sm border-0">
+
+
+<div class="card-body">
+
+
+<form method="GET"
+action="{{ url_for('admin.audit_logs') }}">
+
+
+<div class="row">
+
+
+<div class="col-md-4 mb-3">
+
+
+<input
+type="text"
+class="form-control"
+name="search"
+placeholder="Search activity...">
+
+
+</div>
+
+
+
+<div class="col-md-3 mb-3">
+
+
+<select class="form-select"
+name="role">
+
+
+<option value="">
+
+All Users
+
+</option>
+
+
+<option value="admin">
+
+Admin
+
+</option>
+
+
+<option value="user">
+
+User
+
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+<div class="col-md-3 mb-3">
+
+
+<input
+type="date"
+class="form-control"
+name="date">
+
+
+</div>
+
+
+
+<div class="col-md-2 mb-3">
+
+
+<button class="btn btn-success w-100">
+
+
+<i class="fa-solid fa-filter"></i>
+
+
+Filter
+
+
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+</form>
+
+
+</div>
+
+
+</div>
+<!-- Audit Logs Table -->
+
+<div class="card shadow-sm border-0 mt-4">
+
+
+<div class="card-header bg-dark text-white">
+
+
+<h5 class="mb-0">
+
+<i class="fa-solid fa-file-shield"></i>
+
+System Audit Trail
+
+</h5>
+
+
+</div>
+
+
+
+
+<div class="card-body table-responsive">
+
+
+
+<table class="table table-hover align-middle">
+
+
+
+<thead class="table-light">
+
+
+<tr>
+
+<th>#</th>
+
+<th>User</th>
+
+<th>Role</th>
+
+<th>Action</th>
+
+<th>Module</th>
+
+<th>IP Address</th>
+
+<th>Device</th>
+
+<th>Date</th>
+
+<th>Status</th>
+
+</tr>
+
+
+</thead>
+
+
+
+
+<tbody>
+
+
+
+{% for log in audit_logs %}
+
+
+
+<tr>
+
+
+<td>
+
+{{ loop.index }}
+
+</td>
+
+
+
+<td>
+
+<strong>
+
+{{ log.username }}
+
+</strong>
+
+
+</td>
+
+
+
+<td>
+
+
+{% if log.role == "Admin" %}
+
+
+<span class="badge bg-primary">
+
+Admin
+
+</span>
+
+
+
+{% else %}
+
+
+<span class="badge bg-secondary">
+
+User
+
+</span>
+
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+<td>
+
+{{ log.action }}
+
+</td>
+
+
+
+<td>
+
+{{ log.module }}
+
+</td>
+
+
+
+<td>
+
+
+<code>
+
+{{ log.ip_address }}
+
+</code>
+
+
+</td>
+
+
+
+<td>
+
+
+<i class="fa-solid fa-desktop"></i>
+
+
+{{ log.device }}
+
+
+</td>
+
+
+
+<td>
+
+{{ log.created_at }}
+
+</td>
+
+
+
+<td>
+
+
+
+{% if log.status == "Success" %}
+
+
+<span class="badge bg-success">
+
+Success
+
+</span>
+
+
+
+{% elif log.status == "Warning" %}
+
+
+<span class="badge bg-warning text-dark">
+
+Warning
+
+</span>
+
+
+
+{% else %}
+
+
+<span class="badge bg-danger">
+
+Failed
+
+</span>
+
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% else %}
+
+
+
+<tr>
+
+
+<td colspan="9"
+class="text-center py-5 text-muted">
+
+
+<i class="fa-solid fa-shield-halved fa-3x mb-3"></i>
+
+
+<h5>
+
+No audit records available
+
+</h5>
+
+
+</td>
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- Export Section -->
+
+
+<div class="card shadow-sm border-0 mt-4">
+
+
+<div class="card-body text-center">
+
+
+<h5>
+
+Export Audit Report
+
+</h5>
+
+
+<p class="text-muted">
+
+Download complete security activity report
+
+</p>
+
+
+
+<a href="{{ url_for('admin.export_audit_pdf') }}"
+class="btn btn-danger me-2">
+
+
+<i class="fa-solid fa-file-pdf"></i>
+
+
+PDF Report
+
+
+</a>
+
+
+
+
+<a href="{{ url_for('admin.export_audit_excel') }}"
+class="btn btn-success">
+
+
+<i class="fa-solid fa-file-excel"></i>
+
+
+Excel Report
+
+
+</a>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- Pagination -->
+
+
+{% if pagination is defined %}
+
+
+
+<nav class="mt-4">
+
+
+<ul class="pagination justify-content-center">
+
+
+{% if pagination.has_prev %}
+
+
+<li class="page-item">
+
+
+<a class="page-link"
+href="?page={{ pagination.prev_num }}">
+
+
+Previous
+
+
+</a>
+
+
+</li>
+
+
+{% endif %}
+
+
+
+
+{% for page in pagination.iter_pages() %}
+
+
+
+{% if page %}
+
+
+<li class="page-item {% if page == pagination.page %}active{% endif %}">
+
+
+<a class="page-link"
+href="?page={{ page }}">
+
+
+{{ page }}
+
+
+</a>
+
+
+</li>
+
+
+
+{% endif %}
+
+
+
+{% endfor %}
+
+
+
+
+{% if pagination.has_next %}
+
+
+<li class="page-item">
+
+
+<a class="page-link"
+href="?page={{ pagination.next_num }}">
+
+
+Next
+
+
+</a>
+
+
+</li>
+
+
+{% endif %}
+
+
+
+</ul>
+
+
+</nav>
+
+
+{% endif %}
+
+
+
+
+
+<!-- Footer -->
+
+
+<footer class="bg-dark text-white text-center py-4 mt-5">
+
+
+<div class="container">
+
+
+<h5>
+
+⚡ EV Charging Finder Admin Panel
+
+</h5>
+
+
+<p class="mb-0">
+
+BCA Final Year Project © 2026
+
+</p>
+
+
+</div>
+
+
+</footer>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+<script>
+
+
+setTimeout(function(){
+
+
+document.querySelectorAll(".alert").forEach(function(alert){
+
+
+alert.remove();
+
+
+});
+
+
+},4000);
+
+
+
+</script>
+
+
+
+
+</div>
+
+
+</body>
+
+
+</html>

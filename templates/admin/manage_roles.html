@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+
+<title>Manage Roles | EV Charging Finder Admin</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body class="bg-light">
+
+
+
+{% include 'admin/_sidebar.html' %}
+
+
+
+
+
+<div class="container-fluid"
+style="margin-left:260px;padding:30px;">
+
+
+
+
+
+
+
+
+<!-- Header -->
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+
+<div>
+
+
+<h2 class="fw-bold">
+
+
+<i class="fa-solid fa-user-lock text-success"></i>
+
+
+Manage Roles
+
+
+</h2>
+
+
+<p class="text-muted">
+
+Control administrator roles and permissions
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+<a href="{{ url_for('admin.dashboard') }}"
+class="btn btn-outline-success">
+
+
+<i class="fa-solid fa-house"></i>
+
+
+Dashboard
+
+
+</a>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{% with messages=get_flashed_messages(with_categories=true) %}
+
+
+{% if messages %}
+
+
+
+{% for category,message in messages %}
+
+
+<div class="alert alert-{{category}} alert-dismissible fade show">
+
+
+{{ message }}
+
+
+<button type="button"
+class="btn-close"
+data-bs-dismiss="alert">
+
+</button>
+
+
+</div>
+
+
+{% endfor %}
+
+
+
+{% endif %}
+
+
+{% endwith %}
+
+
+
+
+
+
+
+
+
+<!-- Role Statistics -->
+
+
+<div class="row mb-4">
+
+
+
+<div class="col-md-4 mb-3">
+
+
+<div class="card border-primary shadow-sm">
+
+
+<div class="card-body text-center">
+
+
+<i class="fa-solid fa-users-gear fa-2x text-primary"></i>
+
+
+<h3>
+
+
+{{ total_roles if total_roles is defined else 0 }}
+
+
+</h3>
+
+
+<p class="mb-0">
+
+
+Total Roles
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="col-md-4 mb-3">
+
+
+<div class="card border-success shadow-sm">
+
+
+<div class="card-body text-center">
+
+
+<i class="fa-solid fa-user-shield fa-2x text-success"></i>
+
+
+<h3>
+
+
+{{ active_roles if active_roles is defined else 0 }}
+
+
+</h3>
+
+
+<p class="mb-0">
+
+
+Active Roles
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="col-md-4 mb-3">
+
+
+<div class="card border-warning shadow-sm">
+
+
+<div class="card-body text-center">
+
+
+<i class="fa-solid fa-key fa-2x text-warning"></i>
+
+
+<h3>
+
+
+{{ permissions if permissions is defined else 0 }}
+
+
+</h3>
+
+
+<p class="mb-0">
+
+
+Permissions
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+<!-- Add Role Button -->
+
+
+<div class="text-end mb-3">
+
+
+<a href="{{ url_for('admin.add_role') }}"
+class="btn btn-success">
+
+
+<i class="fa-solid fa-plus"></i>
+
+
+Add New Role
+
+
+</a>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Roles Table -->
+
+
+<div class="card shadow-sm border-0">
+
+
+<div class="card-header bg-dark text-white">
+
+
+<h5 class="mb-0">
+
+
+<i class="fa-solid fa-list"></i>
+
+
+Role Management
+
+
+</h5>
+
+
+</div>
+
+
+
+
+
+
+<div class="card-body table-responsive">
+
+
+
+<table class="table table-hover align-middle">
+
+
+
+<thead class="table-light">
+
+
+<tr>
+
+
+<th>#</th>
+
+<th>Role Name</th>
+
+<th>Description</th>
+
+<th>Permissions</th>
+
+<th>Status</th>
+
+<th>Actions</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+
+
+<tbody>
+
+
+
+{% for role in roles %}
+
+
+
+<tr>
+
+
+
+<td>
+
+{{ loop.index }}
+
+</td>
+
+
+
+
+
+
+
+<td>
+
+
+<strong>
+
+
+{{ role.name }}
+
+
+</strong>
+
+
+</td>
+
+
+
+
+
+
+
+<td>
+
+
+{{ role.description }}
+
+
+</td>
+
+
+
+
+
+
+
+<td>
+
+
+
+{% for permission in role.permissions %}
+
+
+
+<span class="badge bg-primary me-1 mb-1">
+
+
+{{ permission.name }}
+
+
+</span>
+
+
+
+{% else %}
+
+
+<span class="text-muted">
+
+
+No permissions
+
+
+</span>
+
+
+{% endfor %}
+
+
+
+</td>
+
+
+
+
+
+
+
+<td>
+
+
+
+{% if role.status=="Active" %}
+
+
+
+<span class="badge bg-success">
+
+
+Active
+
+
+</span>
+
+
+
+{% else %}
+
+
+
+<span class="badge bg-danger">
+
+
+Inactive
+
+
+</span>
+
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+
+
+
+
+<td>
+
+
+
+<a href="{{ url_for('admin.edit_role', id=role.id) }}"
+class="btn btn-sm btn-primary">
+
+
+<i class="fa-solid fa-pen"></i>
+
+
+</a>
+
+
+
+
+
+
+
+<a href="{{ url_for('admin.delete_role', id=role.id) }}"
+class="btn btn-sm btn-danger"
+onclick="return confirm('Delete this role?');">
+
+
+<i class="fa-solid fa-trash"></i>
+
+
+</a>
+
+
+
+</td>
+
+
+
+
+</tr>
+
+
+
+
+
+
+
+
+{% else %}
+
+
+
+<tr>
+
+
+<td colspan="6"
+class="text-center py-5 text-muted">
+
+
+<i class="fa-solid fa-user-lock fa-3x mb-3"></i>
+
+
+<h5>
+
+No roles found
+
+</h5>
+
+
+</td>
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Permission Information -->
+
+
+<div class="card shadow-sm border-0 mt-4">
+
+
+<div class="card-header bg-success text-white">
+
+
+<h5 class="mb-0">
+
+
+<i class="fa-solid fa-shield"></i>
+
+
+Available Permissions
+
+
+</h5>
+
+
+</div>
+
+
+
+
+
+
+<div class="card-body">
+
+
+
+<div class="row">
+
+
+
+<div class="col-md-3 mb-3">
+
+
+<div class="border rounded p-3 text-center">
+
+
+<i class="fa-solid fa-users text-primary fa-2x"></i>
+
+
+<p class="mt-2 mb-0">
+
+
+Manage Users
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="col-md-3 mb-3">
+
+
+<div class="border rounded p-3 text-center">
+
+
+<i class="fa-solid fa-charging-station text-success fa-2x"></i>
+
+
+<p class="mt-2 mb-0">
+
+
+Manage Stations
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="col-md-3 mb-3">
+
+
+<div class="border rounded p-3 text-center">
+
+
+<i class="fa-solid fa-calendar-check text-warning fa-2x"></i>
+
+
+<p class="mt-2 mb-0">
+
+
+Manage Bookings
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="col-md-3 mb-3">
+
+
+<div class="border rounded p-3 text-center">
+
+
+<i class="fa-solid fa-chart-line text-danger fa-2x"></i>
+
+
+<p class="mt-2 mb-0">
+
+
+View Reports
+
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Footer -->
+
+
+<footer class="bg-dark text-white text-center py-4 mt-5">
+
+
+<div class="container">
+
+
+<h5>
+
+
+⚡ EV Charging Finder Admin Panel
+
+
+</h5>
+
+
+<p class="mb-0">
+
+
+BCA Final Year Project © 2026
+
+
+</p>
+
+
+</div>
+
+
+</footer>
+
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+
+
+<script>
+
+
+setTimeout(function(){
+
+
+let alerts=document.querySelectorAll(".alert");
+
+
+alerts.forEach(function(alert){
+
+
+alert.remove();
+
+
+});
+
+
+},4000);
+
+
+
+</script>
+
+
+
+
+
+
+
+</div>
+
+
+</body>
+
+
+</html>

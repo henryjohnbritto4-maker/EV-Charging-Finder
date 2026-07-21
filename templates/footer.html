@@ -1,0 +1,217 @@
+<!-- ===========================
+     EV Charging Finder Footer
+=========================== -->
+{% include 'footer.html' %}
+<footer class="bg-dark text-light mt-5">
+
+    <div class="container py-5">
+
+        <div class="row">
+
+            <!-- About -->
+
+            <div class="col-lg-4 col-md-6 mb-4">
+
+                <h4 class="fw-bold text-success">
+
+                    <i class="fa-solid fa-bolt"></i>
+
+                    EV Charging Finder
+
+                </h4>
+
+                <p class="mt-3">
+
+                    Find nearby EV charging stations, reserve charging slots,
+                    manage bookings, and navigate to charging locations with
+                    ease.
+
+                </p>
+
+            </div>
+
+            <!-- Quick Links -->
+
+            <div class="col-lg-2 col-md-6 mb-4">
+
+                <h5 class="text-success">
+
+                    Quick Links
+
+                </h5>
+
+                <ul class="list-unstyled">
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('main.dashboard') }}" class="text-light text-decoration-none">
+
+                            Dashboard
+
+                        </a>
+
+                    </li>
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('main.stations') }}" class="text-light text-decoration-none">
+
+                            Stations
+
+                        </a>
+
+                    </li>
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('main.history') }}" class="text-light text-decoration-none">
+
+                            Booking History
+
+                        </a>
+
+                    </li>
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('main.profile') }}" class="text-light text-decoration-none">
+
+                            Profile
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <!-- Contact -->
+
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <h5 class="text-success">
+
+                    Contact
+
+                </h5>
+
+                <p>
+
+                    <i class="fa-solid fa-envelope me-2"></i>
+
+                    support@evfinder.com
+
+                </p>
+
+                <p>
+
+                    <i class="fa-solid fa-phone me-2"></i>
+
+                    +91 98765 43210
+
+                </p>
+
+                <p>
+
+                    <i class="fa-solid fa-location-dot me-2"></i>
+
+                    Chennai, Tamil Nadu
+
+                </p>
+
+            </div>
+
+            <!-- Social -->
+
+            <div class="col-lg-3 col-md-6 mb-4">
+
+                <h5 class="text-success">
+
+                    Follow Us
+
+                </h5>
+
+                <a href="#" class="btn btn-outline-light btn-sm me-2 mb-2">
+
+                    <i class="fab fa-facebook-f"></i>
+
+                </a>
+
+                <a href="#" class="btn btn-outline-light btn-sm me-2 mb-2">
+
+                    <i class="fab fa-instagram"></i>
+
+                </a>
+
+                <a href="#" class="btn btn-outline-light btn-sm me-2 mb-2">
+
+                    <i class="fab fa-twitter"></i>
+
+                </a>
+
+                <a href="#" class="btn btn-outline-light btn-sm me-2 mb-2">
+
+                    <i class="fab fa-linkedin"></i>
+
+                </a>
+
+                <a href="#" class="btn btn-outline-light btn-sm me-2 mb-2">
+
+                    <i class="fab fa-github"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <hr class="border-secondary">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-6">
+
+                <p class="mb-0">
+
+                    © 2026 EV Charging Finder. All Rights Reserved.
+
+                </p>
+
+            </div>
+
+            <div class="col-md-6 text-md-end">
+
+                <a href="#" id="backToTop" class="btn btn-success">
+
+                    <i class="fa-solid fa-arrow-up"></i>
+
+                    Back to Top
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<script>
+
+document.getElementById("backToTop").addEventListener("click",function(e){
+
+    e.preventDefault();
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+    });
+
+});
+
+</script>

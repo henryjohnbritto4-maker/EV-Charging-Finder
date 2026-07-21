@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+
+<title>View Station | EV Charging Finder Admin</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/admin.css') }}">
+
+</head>
+
+
+<body class="bg-light">
+
+
+{% include 'admin/_sidebar.html' %}
+
+
+
+
+<div class="container-fluid"
+style="margin-left:260px;padding:30px;">
+
+
+
+
+
+<!-- Header -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+
+<div>
+
+
+<h2 class="fw-bold">
+
+
+<i class="fa-solid fa-charging-station text-success"></i>
+
+
+Station Details
+
+
+</h2>
+
+
+<p class="text-muted">
+
+Complete charging station information
+
+</p>
+
+
+</div>
+
+
+
+
+
+<a href="{{ url_for('admin.stations') }}"
+class="btn btn-outline-success">
+
+
+<i class="fa-solid fa-arrow-left"></i>
+
+
+Back to Stations
+
+
+</a>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- Station Profile -->
+
+
+<div class="card shadow-lg border-0 mb-4">
+
+
+<div class="card-header bg-success text-white">
+
+
+<h4 class="mb-0">
+
+
+<i class="fa-solid fa-bolt"></i>
+
+
+{{ station.name }}
+
+
+</h4>
+
+
+</div>
+
+
+
+
+
+<div class="card-body">
+
+
+<div class="row align-items-center">
+
+
+
+<div class="col-md-4 text-center">
+
+
+
+<img src="{{ url_for('static', filename='uploads/' + station.image) if station.image else url_for('static', filename='images/station-default.jpg') }}"
+class="img-fluid rounded shadow"
+style="height:250px;width:100%;object-fit:cover;">
+
+
+
+</div>
+
+
+
+
+
+
+<div class="col-md-8">
+
+
+
+<div class="row">
+
+
+
+<div class="col-md-6 mb-3">
+
+
+<h6 class="text-muted">
+
+Station Name
+
+</h6>
+
+
+<h5>
+
+{{ station.name }}
+
+</h5>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-6 mb-3">
+
+
+<h6 class="text-muted">
+
+Status
+
+</h6>
+
+
+
+{% if station.status=="Active" %}
+
+
+<span class="badge bg-success fs-6">
+
+Active
+
+</span>
+
+
+{% else %}
+
+
+<span class="badge bg-danger fs-6">
+
+Inactive
+
+</span>
+
+
+{% endif %}
+
+
+
+</div>
+
+
+
+
+
+<div class="col-md-6 mb-3">
+
+
+<h6 class="text-muted">
+
+Location
+
+</h6>
+
+
+<p>
+
+
+<i class="fa-solid fa-location-dot text-danger"></i>
+
+
+{{ station.location }}
+
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-6 mb-3">
+
+
+<h6 class="text-muted">
+
+Contact Number
+
+</h6>
+
+
+<p>
+
+
+{{ station.phone if station.phone else "N/A" }}
+
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- Charger Information -->
+
+
+<div class="card shadow-sm border-0 mb-4">
+
+
+<div class="card-header bg-primary text-white">
+
+
+<h5 class="mb-0">
+
+
+<i class="fa-solid fa-plug"></i>
+
+
+Charger Information
+
+
+</h5>
+
+
+</div>
+
+
+
+<div class="card-body">
+
+
+<div class="row text-center">
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-bolt fa-2x text-warning"></i>
+
+
+<h5 class="mt-2">
+
+Charger Type
+
+</h5>
+
+
+<p>
+
+{{ station.charger_type }}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-charging-station fa-2x text-success"></i>
+
+
+<h5 class="mt-2">
+
+Total Slots
+
+</h5>
+
+
+<p>
+
+{{ station.total_slots }}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-circle-check fa-2x text-primary"></i>
+
+
+<h5 class="mt-2">
+
+Available
+
+</h5>
+
+
+<p>
+
+{{ station.available_slots }}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-indian-rupee-sign fa-2x text-danger"></i>
+
+
+<h5 class="mt-2">
+
+Price / Unit
+
+</h5>
+
+
+<p>
+
+₹ {{ station.price }}
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+<!-- Map Section -->
+
+
+<div class="card shadow-sm border-0 mb-4">
+
+
+<div class="card-header bg-dark text-white">
+
+
+<h5 class="mb-0">
+
+
+<i class="fa-solid fa-map-location-dot"></i>
+
+
+Station Location
+
+
+</h5>
+
+
+</div>
+
+
+
+<div class="card-body">
+
+
+
+<div id="map"
+style="height:350px;border-radius:10px;">
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- Booking Statistics -->
+
+
+<div class="row g-4 mb-4">
+
+
+
+<div class="col-md-4">
+
+
+<div class="card border-success shadow-sm">
+
+
+<div class="card-body text-center">
+
+
+<i class="fa-solid fa-calendar-check fa-2x text-success"></i>
+
+
+<h3>
+
+
+{{ total_bookings if total_bookings is defined else 0 }}
+
+
+</h3>
+
+
+<p class="mb-0">
+
+Total Bookings
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-4">
+
+
+<div class="card border-primary shadow-sm">
+
+
+<div class="card-body text-center">
+
+
+<i class="fa-solid fa-users fa-2x text-primary"></i>
+
+
+<h3>
+
+
+{{ customers if customers is defined else 0 }}
+
+
+</h3>
+
+
+<p class="mb-0">
+
+Customers
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-4">
+
+
+<div class="card border-warning shadow-sm">
+
+
+<div class="card-body text-center">
+
+
+<i class="fa-solid fa-indian-rupee-sign fa-2x text-warning"></i>
+
+
+<h3>
+
+
+₹ {{ revenue if revenue is defined else 0 }}
+
+
+</h3>
+
+
+<p class="mb-0">
+
+Revenue
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Facilities -->
+
+
+<div class="card shadow-sm border-0 mb-4">
+
+
+<div class="card-header bg-success text-white">
+
+
+<h5 class="mb-0">
+
+
+<i class="fa-solid fa-list-check"></i>
+
+
+Available Facilities
+
+
+</h5>
+
+
+</div>
+
+
+
+<div class="card-body">
+
+
+
+<div class="row text-center">
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-wifi fa-2x text-primary"></i>
+
+
+<p class="mt-2">
+
+WiFi
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-car fa-2x text-success"></i>
+
+
+<p class="mt-2">
+
+Parking
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-shop fa-2x text-warning"></i>
+
+
+<p class="mt-2">
+
+Refreshments
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="col-md-3">
+
+
+<i class="fa-solid fa-video fa-2x text-danger"></i>
+
+
+<p class="mt-2">
+
+Security
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Admin Actions -->
+
+
+<div class="card shadow-sm border-0 mb-4">
+
+
+<div class="card-header bg-danger text-white">
+
+
+<h5 class="mb-0">
+
+
+<i class="fa-solid fa-gears"></i>
+
+
+Station Management
+
+
+</h5>
+
+
+</div>
+
+
+
+<div class="card-body text-center">
+
+
+
+<a href="{{ url_for('admin.edit_station', id=station.id) }}"
+class="btn btn-warning me-2">
+
+
+<i class="fa-solid fa-pen"></i>
+
+
+Edit Station
+
+
+</a>
+
+
+
+
+
+{% if station.status=="Active" %}
+
+
+<a href="{{ url_for('admin.disable_station', id=station.id) }}"
+class="btn btn-secondary me-2"
+onclick="return confirm('Disable this station?');">
+
+
+<i class="fa-solid fa-power-off"></i>
+
+
+Disable
+
+
+</a>
+
+
+{% else %}
+
+
+<a href="{{ url_for('admin.enable_station', id=station.id) }}"
+class="btn btn-success me-2">
+
+
+<i class="fa-solid fa-check"></i>
+
+
+Enable
+
+
+</a>
+
+
+{% endif %}
+
+
+
+
+
+
+
+<a href="{{ url_for('admin.delete_station', id=station.id) }}"
+class="btn btn-danger"
+onclick="return confirm('Delete this station permanently?');">
+
+
+<i class="fa-solid fa-trash"></i>
+
+
+Delete
+
+
+</a>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Footer -->
+
+
+<footer class="bg-dark text-white text-center py-4 mt-5">
+
+
+<div class="container">
+
+
+<h5>
+
+⚡ EV Charging Finder Admin Panel
+
+</h5>
+
+
+<p class="mb-0">
+
+BCA Final Year Project © 2026
+
+</p>
+
+
+</div>
+
+
+</footer>
+
+
+
+
+
+
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
+<script>
+
+
+let lat={{ station.latitude if station.latitude else 13.0827 }};
+
+
+let lng={{ station.longitude if station.longitude else 80.2707 }};
+
+
+
+let map=L.map('map').setView([lat,lng],15);
+
+
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19
+}
+).addTo(map);
+
+
+
+L.marker([lat,lng])
+.addTo(map)
+.bindPopup("{{ station.name }}")
+.openPopup();
+
+
+
+</script>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+
+
+</div>
+
+
+</body>
+
+
+</html>

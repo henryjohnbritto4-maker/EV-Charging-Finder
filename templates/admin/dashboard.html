@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Admin Dashboard</title>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+</head>
+
+
+<body class="bg-light">
+
+
+
+<nav class="navbar navbar-dark bg-dark">
+
+
+    <div class="container">
+
+
+        <a class="navbar-brand fw-bold"
+           href="{{ url_for('admin.dashboard') }}">
+
+            ⚡ EV Admin Panel
+
+        </a>
+
+
+
+
+        <div>
+
+
+            <a href="{{ url_for('main.home') }}"
+               class="btn btn-light">
+
+                Website
+
+            </a>
+
+
+
+            <a href="{{ url_for('main.logout') }}"
+               class="btn btn-danger">
+
+                Logout
+
+            </a>
+
+
+
+        </div>
+
+
+    </div>
+
+
+</nav>
+
+
+
+
+
+
+
+
+
+<div class="container mt-4">
+
+
+
+    <div class="d-flex justify-content-between mb-3">
+
+
+        <h2>
+
+            Admin Dashboard
+
+        </h2>
+
+
+
+        <a href="{{ url_for('admin.add_station') }}"
+           class="btn btn-success">
+
+            + Add Station
+
+        </a>
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card shadow">
+
+
+        <div class="card-header bg-success text-white">
+
+
+            <h4 class="mb-0">
+
+                Charging Stations
+
+            </h4>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="card-body">
+
+
+
+            {% if stations %}
+
+
+
+            <div class="table-responsive">
+
+
+                <table class="table table-bordered">
+
+
+                    <thead>
+
+
+                        <tr>
+
+
+                            <th>
+
+                                Name
+
+                            </th>
+
+
+                            <th>
+
+                                Location
+
+                            </th>
+
+
+                            <th>
+
+                                Charger
+
+                            </th>
+
+
+                            <th>
+
+                                Slots
+
+                            </th>
+
+
+                            <th>
+
+                                Latitude
+
+                            </th>
+
+
+                            <th>
+
+                                Longitude
+
+                            </th>
+
+
+                            <th>
+
+                                Actions
+
+                            </th>
+
+
+                        </tr>
+
+
+                    </thead>
+
+
+
+
+
+                    <tbody>
+
+
+
+                    {% for station in stations %}
+
+
+
+                        <tr>
+
+
+                            <td>
+
+                                {{ station.name }}
+
+                            </td>
+
+
+
+                            <td>
+
+                                {{ station.location }}
+
+                            </td>
+
+
+
+                            <td>
+
+                                {{ station.charger_type }}
+
+                            </td>
+
+
+
+                            <td>
+
+                                {{ station.available_slots }}
+
+                                /
+
+                                {{ station.total_slots }}
+
+                            </td>
+
+
+
+                            <td>
+
+                                {{ station.latitude }}
+
+                            </td>
+
+
+
+                            <td>
+
+                                {{ station.longitude }}
+
+                            </td>
+
+
+
+
+                            <td>
+
+
+
+                                <a href="{{ url_for('admin.edit_station', id=station.id) }}"
+
+                                   class="btn btn-primary btn-sm">
+
+                                    Edit
+
+                                </a>
+
+
+
+
+
+                                <a href="{{ url_for('admin.delete_station', id=station.id) }}"
+
+                                   class="btn btn-danger btn-sm"
+
+                                   onclick="return confirm('Delete this station?')">
+
+                                    Delete
+
+                                </a>
+
+
+
+                            </td>
+
+
+
+                        </tr>
+
+
+
+                    {% endfor %}
+
+
+
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+
+
+
+            {% else %}
+
+
+
+            <div class="text-center">
+
+
+                <h5>
+
+                    No stations added yet.
+
+                </h5>
+
+
+
+            </div>
+
+
+
+            {% endif %}
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="mt-4">
+
+
+        <a href="{{ url_for('admin.bookings') }}"
+           class="btn btn-warning">
+
+
+            Manage Bookings
+
+
+        </a>
+
+
+    </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</body>
+
+</html>

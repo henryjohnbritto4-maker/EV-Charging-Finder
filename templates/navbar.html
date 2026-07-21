@@ -1,0 +1,168 @@
+<!-- ===========================
+     EV Charging Finder Navbar
+============================ -->
+{% include 'navbar.html' %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow sticky-top">
+
+<div class="container">
+
+<a class="navbar-brand fw-bold" href="{{ url_for('main.dashboard') }}">
+
+<i class="fa-solid fa-bolt"></i>
+
+EV Charging Finder
+
+</a>
+
+<button
+class="navbar-toggler"
+type="button"
+data-bs-toggle="collapse"
+data-bs-target="#navbar">
+
+<span class="navbar-toggler-icon"></span>
+
+</button>
+
+<div class="collapse navbar-collapse"
+id="navbar">
+
+<ul class="navbar-nav ms-auto align-items-lg-center">
+
+<li class="nav-item">
+
+<a class="nav-link {% if request.endpoint=='main.dashboard' %}active{% endif %}"
+href="{{ url_for('main.dashboard') }}">
+
+<i class="fa-solid fa-house"></i>
+
+Dashboard
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a class="nav-link {% if request.endpoint=='main.stations' %}active{% endif %}"
+href="{{ url_for('main.stations') }}">
+
+<i class="fa-solid fa-charging-station"></i>
+
+Stations
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a class="nav-link {% if request.endpoint=='main.history' %}active{% endif %}"
+href="{{ url_for('main.history') }}">
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+History
+
+</a>
+
+</li>
+
+<li class="nav-item">
+
+<a class="nav-link {% if request.endpoint=='main.profile' %}active{% endif %}"
+href="{{ url_for('main.profile') }}">
+
+<i class="fa-solid fa-user"></i>
+
+Profile
+
+</a>
+
+</li>
+
+<li class="nav-item dropdown">
+
+<a
+class="nav-link dropdown-toggle"
+href="#"
+role="button"
+data-bs-toggle="dropdown">
+
+<i class="fa-solid fa-circle-user"></i>
+
+{{ current_user.name }}
+
+</a>
+
+<ul class="dropdown-menu dropdown-menu-end shadow">
+
+<li>
+
+<a
+class="dropdown-item"
+href="{{ url_for('main.profile') }}">
+
+<i class="fa-solid fa-user"></i>
+
+My Profile
+
+</a>
+
+</li>
+
+<li>
+
+<a
+class="dropdown-item"
+href="{{ url_for('main.edit_profile') }}">
+
+<i class="fa-solid fa-user-pen"></i>
+
+Edit Profile
+
+</a>
+
+</li>
+
+<li>
+
+<a
+class="dropdown-item"
+href="{{ url_for('main.history') }}">
+
+<i class="fa-solid fa-calendar-check"></i>
+
+My Bookings
+
+</a>
+
+</li>
+
+<li><hr class="dropdown-divider"></li>
+
+<li>
+
+<a
+class="dropdown-item text-danger"
+href="{{ url_for('main.logout') }}">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</a>
+
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</nav>
