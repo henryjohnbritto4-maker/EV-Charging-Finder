@@ -4,26 +4,19 @@ from flask import (
     request,
     redirect,
     url_for,
-    flash
+    flash,
+    session
 )
 
-from flask_login import (
-    login_required,
-    current_user
-)
-
-from database import db
+from werkzeug.security import check_password_hash
 
 from models import (
+    db,
+    Admin,
     Station,
     Booking
 )
 
-
-
-# ==========================
-# ADMIN BLUEPRINT
-# ==========================
 
 admin_bp = Blueprint(
     "admin",
@@ -33,6 +26,64 @@ admin_bp = Blueprint(
 
 
 
+# ==========================
+# ADMIN LOGIN
+# ==========================
+
+@admin_bp.route(
+    "/login",
+    methods=["GET","POST"]
+)
+def login():
+
+
+    if request.method == "POST":
+
+        username = request.form.get(
+            "username"
+        )
+
+        password = request.form.get(
+            "password"
+        )
+
+
+        admin = Admin.query.filter_by(
+            username=username
+        ).first()
+
+
+        if admin and check_password_hash(
+            admin.password,
+            password
+        ):
+
+            session["admin_id"] = admin.id
+
+
+            flash(
+                "Login successful",
+                "success"
+            )
+
+
+            return redirect(
+                url_for(
+                    "admin.dashboard"
+                )
+            )
+
+
+        flash(
+            "Invalid username or password",
+            "danger"
+        )
+
+
+    return render_template(
+        "admin/login.html"
+    )
+
 
 
 # ==========================
@@ -41,58 +92,34 @@ admin_bp = Blueprint(
 
 def admin_required():
 
-    if not current_user.is_authenticated:
-
-        return False
-
-
-    if current_user.role != "admin":
-
-        flash(
-            "Admin access required.",
-            "danger"
-        )
-
-        return False
-
-
-    return True
-
-
-
-
+    return "admin_id" in session
 
 
 
 # ==========================
-# ADMIN DASHBOARD
+# DASHBOARD
 # ==========================
 
 @admin_bp.route("/dashboard")
-@login_required
 def dashboard():
 
 
     if not admin_required():
 
         return redirect(
-            url_for("main.home")
+            url_for(
+                "admin.login"
+            )
         )
 
 
     stations = Station.query.all()
 
 
-
     return render_template(
         "admin/dashboard.html",
         stations=stations
     )
-
-
-
-
-
 
 
 
@@ -104,20 +131,19 @@ def dashboard():
     "/add_station",
     methods=["GET","POST"]
 )
-
-@login_required
 def add_station():
 
 
     if not admin_required():
 
         return redirect(
-            url_for("main.home")
+            url_for(
+                "admin.login"
+            )
         )
 
 
-
-    if request.method == "POST":
+    if request.method=="POST":
 
 
         station = Station(
@@ -126,26 +152,34 @@ def add_station():
 
             location=request.form.get("location"),
 
-            charger_type=request.form.get("charger_type"),
-
-            total_slots=int(
-                request.form.get("total_slots")
-            ),
-
-            available_slots=int(
-                request.form.get("available_slots")
+            charger_type=request.form.get(
+                "charger_type"
             ),
 
             latitude=float(
-                request.form.get("latitude")
+                request.form.get(
+                    "latitude"
+                )
             ),
 
             longitude=float(
-                request.form.get("longitude")
+                request.form.get(
+                    "longitude"
+                )
+            ),
+
+            available_slots=int(
+                request.form.get(
+                    "available_slots"
+                )
+            ),
+
+            price=float(
+                request.form.get(
+                    "price"
+                )
             )
-
         )
-
 
 
         db.session.add(station)
@@ -153,17 +187,17 @@ def add_station():
         db.session.commit()
 
 
-
         flash(
-            "Station added successfully.",
+            "Station added",
             "success"
         )
 
 
         return redirect(
-            url_for("admin.dashboard")
+            url_for(
+                "admin.dashboard"
+            )
         )
-
 
 
     return render_template(
@@ -172,184 +206,24 @@ def add_station():
 
 
 
-
-
-
-
-
-
 # ==========================
-# EDIT STATION
-# ==========================
-
-@admin_bp.route(
-    "/edit_station/<int:id>",
-    methods=["GET","POST"]
-)
-
-@login_required
-def edit_station(id):
-
-
-    if not admin_required():
-
-        return redirect(
-            url_for("main.home")
-        )
-
-
-
-    station = Station.query.get_or_404(id)
-
-
-
-    if request.method == "POST":
-
-
-        station.name = request.form.get(
-            "name"
-        )
-
-
-        station.location = request.form.get(
-            "location"
-        )
-
-
-        station.charger_type = request.form.get(
-            "charger_type"
-        )
-
-
-        station.total_slots = int(
-            request.form.get(
-                "total_slots"
-            )
-        )
-
-
-        station.available_slots = int(
-            request.form.get(
-                "available_slots"
-            )
-        )
-
-
-        station.latitude = float(
-            request.form.get(
-                "latitude"
-            )
-        )
-
-
-        station.longitude = float(
-            request.form.get(
-                "longitude"
-            )
-        )
-
-
-
-        db.session.commit()
-
-
-
-        flash(
-            "Station updated successfully.",
-            "success"
-        )
-
-
-
-        return redirect(
-            url_for("admin.dashboard")
-        )
-
-
-
-    return render_template(
-        "admin/edit_station.html",
-        station=station
-    )
-
-
-
-
-
-
-
-
-
-# ==========================
-# DELETE STATION
-# ==========================
-
-@admin_bp.route(
-    "/delete_station/<int:id>"
-)
-
-@login_required
-def delete_station(id):
-
-
-    if not admin_required():
-
-        return redirect(
-            url_for("main.home")
-        )
-
-
-
-    station = Station.query.get_or_404(id)
-
-
-
-    db.session.delete(station)
-
-    db.session.commit()
-
-
-
-    flash(
-        "Station deleted successfully.",
-        "success"
-    )
-
-
-
-    return redirect(
-        url_for("admin.dashboard")
-    )
-
-
-
-
-
-
-
-
-
-# ==========================
-# VIEW BOOKINGS
+# BOOKINGS
 # ==========================
 
 @admin_bp.route("/bookings")
-@login_required
 def bookings():
 
 
     if not admin_required():
 
         return redirect(
-            url_for("main.home")
+            url_for(
+                "admin.login"
+            )
         )
 
 
-
-    bookings = Booking.query.order_by(
-        Booking.id.desc()
-    ).all()
-
+    bookings = Booking.query.all()
 
 
     return render_template(
@@ -359,65 +233,21 @@ def bookings():
 
 
 
-
-
-
-
-
-
 # ==========================
-# UPDATE BOOKING STATUS
+# LOGOUT
 # ==========================
 
-@admin_bp.route(
-    "/update_booking/<int:id>/<status>"
-)
+@admin_bp.route("/logout")
+def logout():
 
-@login_required
-def update_booking(id, status):
-
-
-    if not admin_required():
-
-        return redirect(
-            url_for("main.home")
-        )
-
-
-
-    booking = Booking.query.get_or_404(id)
-
-
-
-    if status in [
-        "Approved",
-        "Rejected"
-    ]:
-
-
-        booking.status = status
-
-
-        db.session.commit()
-
-
-
-        flash(
-            "Booking status updated.",
-            "success"
-        )
-
-
-    else:
-
-
-        flash(
-            "Invalid booking status.",
-            "danger"
-        )
-
+    session.pop(
+        "admin_id",
+        None
+    )
 
 
     return redirect(
-        url_for("admin.bookings")
+        url_for(
+            "admin.login"
+        )
     )

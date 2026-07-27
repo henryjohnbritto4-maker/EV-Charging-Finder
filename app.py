@@ -1,85 +1,157 @@
 from flask import Flask
 
 from flask_login import LoginManager
-
-from database import db
+from flask_migrate import Migrate
 
 from config import Config
+from models import db, User
 
 
+print("APP FILE STARTED")
+
+
+# ==========================
+# EXTENSIONS
+# ==========================
 
 login_manager = LoginManager()
+migrate = Migrate()
 
 
+
+# ==========================
+# USER LOGIN LOADER
+# ==========================
+
+@login_manager.user_loader
+def load_user(user_id):
+
+    return User.query.get(
+        int(user_id)
+    )
+
+
+
+# ==========================
+# APP FACTORY
+# ==========================
 
 def create_app():
-
 
     app = Flask(__name__)
 
 
-    # SECRET KEY FIX
+    # Configuration
 
-    app.config["SECRET_KEY"] = "ev_charging_finder_secret_key_2026"
-
-
-
-    # DATABASE
-
-    app.config.from_object(Config)
+    app.config.from_object(
+        Config
+    )
 
 
+    # Extensions
 
     db.init_app(app)
 
+    login_manager.init_app(
+        app
+    )
+
+    migrate.init_app(
+        app,
+        db
+    )
 
 
-    # LOGIN MANAGER
-
-    login_manager.init_app(app)
-
-
-    login_manager.login_view = "main.login"
-
-
-
-    # USER LOADER
-
-    from models import User
-
-
-    @login_manager.user_loader
-    def load_user(user_id):
-
-        return User.query.get(int(user_id))
+    login_manager.login_view = "auth.login"
 
 
 
-
-
-    # BLUEPRINTS
-
+    # ==========================
+    # USER ROUTES
+    # ==========================
 
     from routes import main_bp
-
-    from admin_routes import admin_bp
-
-
 
     app.register_blueprint(
         main_bp
     )
 
 
-    app.register_blueprint(
-        admin_bp
-    )
+
+    # ==========================
+    # AUTH ROUTES
+    # ==========================
+
+    try:
+
+        from auth_routes import auth_bp
+
+        app.register_blueprint(
+            auth_bp,
+            url_prefix="/auth"
+        )
+
+        print("Auth loaded")
+
+
+    except Exception as e:
+
+        print(
+            "Auth error:",
+            e
+        )
 
 
 
+    # ==========================
+    # ADMIN ROUTES
+    # ==========================
+
+    try:
+
+        from admin_routes import admin_bp
+
+        app.register_blueprint(
+            admin_bp
+        )
+
+        print("Admin loaded")
 
 
-    # CREATE DATABASE
+    except Exception as e:
+
+        print(
+            "Admin error:",
+            e
+        )
+
+
+
+    # ==========================
+    # PAYMENT ROUTES
+    # ==========================
+
+    try:
+
+        from payment_routes import payment_bp
+
+        app.register_blueprint(
+            payment_bp
+        )
+
+        print("Payment loaded")
+
+
+    except Exception as e:
+
+        print(
+            "Payment error:",
+            e
+        )
+
+
+
+    # Create tables
 
     with app.app_context():
 
@@ -93,8 +165,11 @@ def create_app():
 
 
 
-app = create_app()
+# ==========================
+# RUN
+# ==========================
 
+app = create_app()
 
 
 if __name__ == "__main__":

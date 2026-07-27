@@ -1,277 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EV Charging Map</title>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <title>EV Charging Map</title>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
+<style>
 
+body{
+    background:#f5f5f5;
+}
 
-    <!-- Bootstrap -->
+#map{
+    height:650px;
+    width:100%;
+    border-radius:12px;
+}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
-    <!-- Leaflet CSS -->
-
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-
-    <style>
-
-        #map {
-
-            height: 600px;
-            width: 100%;
-
-            border-radius: 10px;
-
-        }
-
-
-    </style>
-
+</style>
 
 </head>
 
+<body>
 
-<body class="bg-light">
+<nav class="navbar navbar-dark bg-success shadow">
 
+<div class="container">
 
+<a class="navbar-brand fw-bold"
+href="{{ url_for('main.dashboard') }}">
 
-<nav class="navbar navbar-dark bg-success">
+⚡ EV Charging Finder
 
+</a>
 
-    <div class="container">
+<a href="{{ url_for('main.dashboard') }}"
+class="btn btn-light">
 
+Dashboard
 
-        <a class="navbar-brand"
-           href="{{ url_for('main.dashboard') }}">
-
-            ⚡ EV Charging Finder
-
-        </a>
-
-
-
-        <a href="{{ url_for('main.dashboard') }}"
-           class="btn btn-light">
-
-            Dashboard
-
-        </a>
-
-
-    </div>
-
-
-</nav>
-
-
-
-
-
-
-
-<div class="container mt-4">
-
-
-    <h3 class="mb-3">
-
-        🗺 Nearby Charging Stations
-
-    </h3>
-
-
-
-
-    <button class="btn btn-primary mb-3"
-            onclick="getLocation()">
-
-        📍 My Location
-
-    </button>
-
-
-
-
-
-    <div id="map"></div>
-
-
+</a>
 
 </div>
 
+</nav>
 
+<div class="container mt-4">
 
+<h3 class="mb-3">
 
+🗺 Nearby Charging Stations
 
+</h3>
 
+<div class="mb-3">
 
-<!-- Leaflet JS -->
+<button class="btn btn-primary"
+onclick="getLocation()">
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+📍 My Location
 
+</button>
 
+</div>
 
+<div id="map"></div>
 
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-
-// Default Chennai location
-
-var map = L.map('map').setView(
-    [13.0827,80.2707],
-    12
-);
-
-
-
-
+const map=L.map('map').setView([13.0827,80.2707],12);
 
 L.tileLayer(
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-
-        maxZoom:19,
-
-        attribution:'© OpenStreetMap'
-
-    }
-
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19,
+attribution:'© OpenStreetMap'
+}
 ).addTo(map);
 
-
-
-
-
-
-
-// Station markers
-
-
-{% for station in stations %}
-
-
-var marker = L.marker(
-    [
-        {{ station.latitude }},
-        {{ station.longitude }}
-    ]
-
-).addTo(map);
-
-
-
-
-
-marker.bindPopup(
-
-    "<h5>{{ station.name }}</h5>" +
-
-    "<p>📍 {{ station.location }}</p>" +
-
-    "<p>🔌 {{ station.charger_type }}</p>" +
-
-    "<p>⚡ Slots: {{ station.available_slots }}/{{ station.total_slots }}</p>" +
-
-    "<a class='btn btn-success btn-sm' href='{{ url_for('main.book', id=station.id) }}'>Book Now</a>"
-
-);
-
-
-
-{% endfor %}
-
-
-
-
-
-
-
-
-
-// User Location
-
+let userMarker=null;
+let userLat=null;
+let userLng=null;
+let routeLine=null;
 
 function getLocation(){
 
+if(!navigator.geolocation){
+alert("Geolocation not supported");
+return;
+}
 
-    if(navigator.geolocation){
+navigator.geolocation.getCurrentPosition(function(position){
 
+userLat=position.coords.latitude;
+userLng=position.coords.longitude;
 
-        navigator.geolocation.getCurrentPosition(
+if(userMarker){
+map.removeLayer(userMarker);
+}
 
-            function(position){
+userMarker=L.marker([userLat,userLng])
+.addTo(map)
+.bindPopup("<b>Your Current Location</b>")
+.openPopup();
 
+map.setView([userLat,userLng],14);
 
-                var lat =
-                position.coords.latitude;
-
-
-                var lon =
-                position.coords.longitude;
-
-
-
-
-                map.setView(
-                    [lat,lon],
-                    15
-                );
-
-
-
-
-                L.marker(
-                    [lat,lon]
-                )
-
-                .addTo(map)
-
-                .bindPopup(
-                    "📍 Your Current Location"
-                )
-
-                .openPopup();
-
-
-
-            }
-
-        );
-
-
-    }
-
-    else{
-
-
-        alert(
-            "Location not supported"
-        );
-
-
-    }
-
+});
 
 }
 
+function drawRoute(stationLat,stationLng){
 
+if(userLat===null){
+
+alert("Click 'My Location' first.");
+
+return;
+
+}
+
+if(routeLine){
+map.removeLayer(routeLine);
+}
+
+routeLine=L.polyline(
+[
+[userLat,userLng],
+[stationLat,stationLng]
+],
+{
+color:"blue",
+weight:5
+}
+).addTo(map);
+
+map.fitBounds(routeLine.getBounds(),{
+padding:[40,40]
+});
+
+}
+
+function openDirections(lat,lng){
+
+if(userLat!==null){
+
+window.open(
+
+"https://www.google.com/maps/dir/?api=1&origin="+
+userLat+","+userLng+
+"&destination="+
+lat+","+lng,
+
+"_blank"
+
+);
+
+}
+else{
+
+window.open(
+
+"https://www.google.com/maps/dir/?api=1&destination="+
+lat+","+lng,
+
+"_blank"
+
+);
+
+}
+
+}
+
+{% for station in stations %}
+
+{% if station.latitude and station.longitude %}
+
+var marker=L.marker([
+{{ station.latitude }},
+{{ station.longitude }}
+]).addTo(map);
+
+marker.bindPopup(`
+
+<h5>{{ station.name }}</h5>
+
+<p>
+📍 {{ station.location }}
+</p>
+
+<p>
+🔌 {{ station.charger_type }}
+</p>
+
+<p>
+⚡ Slots:
+{{ station.available_slots }}/{{ station.total_slots }}
+</p>
+
+<div class="d-grid gap-2">
+
+<a class="btn btn-success btn-sm"
+href="{{ url_for('main.book', id=station.id) }}">
+
+Book Now
+
+</a>
+
+<a class="btn btn-secondary btn-sm"
+href="{{ url_for('main.station_details', id=station.id) }}">
+
+View Details
+
+</a>
+
+<button
+class="btn btn-primary btn-sm"
+onclick="drawRoute({{ station.latitude }},{{ station.longitude }});openDirections({{ station.latitude }},{{ station.longitude }});">
+
+Get Directions
+
+</button>
+
+</div>
+
+`);
+
+{% endif %}
+
+{% endfor %}
+
+getLocation();
 
 </script>
 
-
-
-
-
 </body>
-
 </html>

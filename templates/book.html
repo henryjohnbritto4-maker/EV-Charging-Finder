@@ -3,14 +3,19 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Book Charging Slot</title>
+<title>Book Charging Slot</title>
 
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
 
 </head>
@@ -19,208 +24,57 @@
 <body class="bg-light">
 
 
+<nav class="navbar navbar-dark bg-success shadow">
 
-<nav class="navbar navbar-dark bg-success">
-
-
-    <div class="container">
+<div class="container">
 
 
-        <a class="navbar-brand"
-           href="{{ url_for('main.home') }}">
+<a class="navbar-brand fw-bold"
+href="{{ url_for('main.home') }}">
 
-            ⚡ EV Charging Finder
+⚡ EV Charging Finder
 
-        </a>
+</a>
 
 
 
-        <a href="{{ url_for('main.dashboard') }}"
-           class="btn btn-light">
+<a href="{{ url_for('main.dashboard') }}"
+class="btn btn-light">
 
-            Dashboard
+Dashboard
 
-        </a>
+</a>
 
 
-    </div>
-
+</div>
 
 </nav>
-
-
-
-
-
 
 
 
 <div class="container mt-5">
 
 
-    <div class="row justify-content-center">
+<div class="row justify-content-center">
 
 
-        <div class="col-md-6">
+<div class="col-md-6">
 
 
-            <div class="card shadow p-4">
 
+<div class="card shadow border-0">
 
 
-                <h3 class="text-center mb-4">
+<div class="card-header bg-success text-white text-center">
 
-                    Book Charging Slot
 
-                </h3>
+<h3>
 
+<i class="fa-solid fa-calendar-check"></i>
 
+Book Charging Slot
 
-
-
-                <div class="mb-3">
-
-
-                    <h5>
-
-                        {{ station.name }}
-
-                    </h5>
-
-
-                    <p>
-
-                        📍 {{ station.location }}
-
-                    </p>
-
-
-                    <p>
-
-                        🔌 Charger Type:
-
-                        {{ station.charger_type }}
-
-                    </p>
-
-
-                    <p>
-
-                        Available Slots:
-
-                        <b>
-
-                        {{ station.available_slots }}
-
-                        /
-
-                        {{ station.total_slots }}
-
-                        </b>
-
-                    </p>
-
-
-                </div>
-
-
-
-
-
-
-
-                <form method="POST">
-
-
-
-
-
-                    <div class="mb-3">
-
-
-                        <label class="form-label">
-
-                            Booking Date
-
-                        </label>
-
-
-                        <input
-
-                        type="date"
-
-                        name="date"
-
-                        class="form-control"
-
-                        required>
-
-
-                    </div>
-
-
-
-
-
-
-
-                    <div class="mb-3">
-
-
-                        <label class="form-label">
-
-                            Booking Time
-
-                        </label>
-
-
-                        <input
-
-                        type="time"
-
-                        name="time"
-
-                        class="form-control"
-
-                        required>
-
-
-                    </div>
-
-
-
-
-
-
-
-                    <button
-
-                    type="submit"
-
-                    class="btn btn-success w-100">
-
-
-                        Confirm Booking
-
-
-                    </button>
-
-
-
-
-                </form>
-
-
-
-
-
-            </div>
-
-
-        </div>
-
-
-    </div>
+</h3>
 
 
 </div>
@@ -228,6 +82,207 @@
 
 
 
+<div class="card-body p-4">
+
+
+
+<h4 class="text-success">
+
+{{ station.name }}
+
+</h4>
+
+
+
+<p>
+
+<i class="fa-solid fa-location-dot text-danger"></i>
+
+{{ station.location }}
+
+</p>
+
+
+
+<hr>
+
+
+
+<div class="row">
+
+
+<div class="col-6">
+
+<b>Charger Type</b>
+
+<p>
+
+{{ station.charger_type }}
+
+</p>
+
+</div>
+
+
+
+<div class="col-6">
+
+<b>Available Slots</b>
+
+<p>
+
+{{ station.available_slots }}
+/
+{{ station.total_slots }}
+
+</p>
+
+</div>
+
+
+</div>
+
+
+
+<div class="alert alert-info">
+
+<i class="fa-solid fa-circle-info"></i>
+
+After submitting, you will be redirected to Razorpay payment.
+
+</div>
+
+
+
+<form method="POST">
+
+
+
+<div class="mb-3">
+
+
+<label class="form-label">
+
+Booking Date
+
+</label>
+
+
+<input
+
+type="date"
+
+name="date"
+
+id="date"
+
+class="form-control"
+
+required>
+
+
+</div>
+
+
+
+
+
+<div class="mb-3">
+
+
+<label class="form-label">
+
+Booking Time
+
+</label>
+
+
+<input
+
+type="time"
+
+name="time"
+
+class="form-control"
+
+required>
+
+
+</div>
+
+
+
+
+<button
+
+type="submit"
+
+class="btn btn-success w-100 btn-lg">
+
+
+<i class="fa-solid fa-credit-card"></i>
+
+Proceed To Payment
+
+
+</button>
+
+
+
+</form>
+
+
+
+
+
+<a
+
+href="{{ url_for('main.station_details', id=station.id) }}"
+
+class="btn btn-outline-primary w-100 mt-3">
+
+
+<i class="fa-solid fa-route"></i>
+
+View Station & Directions
+
+
+</a>
+
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<script>
+
+
+// Disable previous dates
+
+let today=new Date()
+.toISOString()
+.split("T")[0];
+
+
+document.getElementById("date").min=today;
+
+
+</script>
 
 
 
