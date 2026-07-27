@@ -101,55 +101,131 @@ def home():
 # ==========================
 # REGISTER
 # ==========================
+# ==========================
+# REGISTER
+# ==========================
 
 @main_bp.route(
     "/register",
-    methods=["GET","POST"]
+    methods=["GET", "POST"]
 )
-
 def register():
 
-    if request.method=="POST":
+    if request.method == "POST":
 
-        user=User(
+        try:
 
-            name=request.form.get("name"),
-
-            email=request.form.get("email"),
-
-            phone=request.form.get("phone"),
-
-            role="user"
-
-        )
+            name = request.form.get("name")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
+            password = request.form.get("password")
 
 
-        user.password=generate_password_hash(
-            request.form.get("password")
-        )
+            # ==========================
+            # VALIDATION
+            # ==========================
+
+            if not name or not email or not password:
+
+                flash(
+                    "Name, Email and Password are required",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for("main.register")
+                )
 
 
-        db.session.add(user)
+            # ==========================
+            # CHECK EXISTING USER
+            # ==========================
 
-        db.session.commit()
-
-
-        flash(
-            "Registration successful",
-            "success"
-        )
+            existing_user = User.query.filter_by(
+                email=email
+            ).first()
 
 
-        return redirect(
-            url_for("main.login")
-        )
+            if existing_user:
+
+                flash(
+                    "Email already registered",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for("main.register")
+                )
+
+
+            # ==========================
+            # CREATE USER
+            # ==========================
+
+            user = User(
+
+                name=name,
+
+                email=email,
+
+                phone=phone,
+
+                password=generate_password_hash(
+                    password
+                ),
+
+                role="user"
+
+            )
+
+
+            # ==========================
+            # SAVE DATABASE
+            # ==========================
+
+            db.session.add(user)
+
+            db.session.commit()
+
+
+
+            flash(
+                "Registration successful. Please login.",
+                "success"
+            )
+
+
+            return redirect(
+                url_for("main.login")
+            )
+
+
+        except Exception as e:
+
+
+            db.session.rollback()
+
+
+            print(
+                "REGISTER ERROR:",
+                e
+            )
+
+
+            flash(
+                "Registration failed: " + str(e),
+                "danger"
+            )
+
+
+            return redirect(
+                url_for("main.register")
+            )
 
 
     return render_template(
         "register.html"
     )
-
-
 
 # ==========================
 # LOGIN
